@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import Todo, { ITodo } from '../models/Todo';
 
@@ -55,7 +55,7 @@ router.delete('/todo/:_id', async (req: Request, res: Response) => {
   try {
     const { _id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
+    if (!Types.ObjectId.isValid(_id)) {
       return res
         .status(404)
         .json({ success: false, error: 'Invalid todo ID' });
