@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "npx tsc",
+    "build": "tsc -p .",
     "dev": "nodemon src/server.ts",
     "start": "node dist/server.js"
   },
