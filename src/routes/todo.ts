@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import mongoose, { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import Todo, { ITodo } from '../models/Todo';
 
