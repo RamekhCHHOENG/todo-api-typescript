@@ -11,9 +11,9 @@ export interface ITodo extends Document {
 
 const todoSchema: Schema = new mongoose.Schema({
   id: { type: String, default: uuidv4, unique: true },
-  todo: { type: String, required: true },
+  todo: { type: String, required: true, unique: true },
   isCompleted: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now() },
   updatedAt: { type: Date, default: null }
 });
 

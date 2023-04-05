@@ -7,7 +7,9 @@ const router = express.Router();
 
 router.get('/todos', async (req: Request, res: Response) => {
   try {
-    const todos = await Todo.find();
+    const { q } = req.query;
+    const filter = q ? { todo: { $regex: q, $options: 'i' } } : {};
+    const todos = await Todo.find(filter).sort({createdAt: -1});
     res.json({ success: true, data: todos });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -17,6 +19,11 @@ router.get('/todos', async (req: Request, res: Response) => {
 router.post('/todo', async (req: Request, res: Response) => {
   try {
     const { todo } = req.body;
+
+    const existingTodo = await Todo.findOne({ todo });
+    if (existingTodo) {
+      return res.status(400).json({ success: false, error: 'Todo already exists' });
+    }
     const newTodo: ITodo = new Todo({
       id: uuidv4(),
       todo,
@@ -31,19 +38,20 @@ router.post('/todo', async (req: Request, res: Response) => {
   }
 });
 
-router.put('/todo/:_id', async (req: Request, res: Response) => {
+router.put('/todo/:id', async (req: Request, res: Response) => {
   try {
-    const { _id } = req.params;
-    const { todo, isCompleted } = req.body;
+    const { id } = req.params;
 
     const updatedFields: any = {};
-    if (todo) updatedFields.todo = todo;
-    if (isCompleted !== undefined) updatedFields.isCompleted = isCompleted;
+    if (req.body.todo) updatedFields.todo = req.body.todo;
+    if (req.body.isCompleted !== undefined) updatedFields.isCompleted = req.body.isCompleted;
+
     updatedFields.updatedAt = Date.now();
 
-    const updatedTodo = await Todo.findByIdAndUpdate(_id, updatedFields, {
-      new: true,
-    });
+    const updatedTodo = await Todo.findByIdAndUpdate(id,
+      { $set: updatedFields },
+      { new: true }
+    );
 
     res.json({ success: true, data: updatedTodo });
   } catch (err: any) {
@@ -51,17 +59,18 @@ router.put('/todo/:_id', async (req: Request, res: Response) => {
   }
 });
 
-router.delete('/todo/:_id', async (req: Request, res: Response) => {
-  try {
-    const { _id } = req.params;
 
-    if (!Types.ObjectId.isValid(_id)) {
+router.delete('/todo/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!Types.ObjectId.isValid(id)) {
       return res
         .status(404)
         .json({ success: false, error: 'Invalid todo ID' });
     }
 
-    const todo = await Todo.findByIdAndDelete(_id);
+    const todo = await Todo.findByIdAndDelete(id);
 
     if (!todo) {
       return res.status(404).json({ success: false, error: 'Todo not found' });
