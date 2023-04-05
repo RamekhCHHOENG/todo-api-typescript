@@ -25,7 +25,6 @@ mongoose.connect(uri, options).then(() => console.log('MongoDB connected success
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(express.static("public"))
-app.set("view engine", "ejs")
 
 const corsOptions: CorsOptions = {
     origin: '*',
