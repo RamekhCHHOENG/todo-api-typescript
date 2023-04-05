@@ -48,6 +48,8 @@ router.put('/todo/:id', async (req: Request, res: Response) => {
 
     const updatedFields: any = {}
     if (req.body.todo) updatedFields.todo = req.body.todo
+    if (req.body.isCompleted !== undefined)
+      updatedFields.isCompleted = req.body.isCompleted
 
     updatedFields.updatedAt = Date.now()
 
